@@ -72,6 +72,79 @@ Ambos fornecem um valor padrão caso o `Optional` esteja vazio, mas com uma dife
 
 **Conclusão:** Prefira `orElseGet()` quando a geração do valor padrão for uma operação custosa (ex: uma chamada ao banco de dados ou um cálculo complexo).
 
+### O que é a API de Streams?
+
+A **API de Streams** fornece uma maneira declarativa e fluente de processar coleções de dados. Um stream não armazena dados, mas transporta valores de uma fonte (como uma `Collection`) através de um pipeline de operações.
+
+**Principais Características:**
+- **Pipeline de Operações:** Um stream é composto por:
+  1.  **Fonte:** A coleção de origem.
+  2.  **Operações Intermediárias (0 ou mais):** Retornam um novo stream e são *lazy* (só executam quando uma operação terminal é invocada). Ex: `filter()`, `map()`, `sorted()`.
+  3.  **Operação Terminal (1):** Inicia o processamento e produz um resultado ou efeito colateral. Ex: `collect()`, `forEach()`, `reduce()`.
+- **Imutabilidade:** Streams não modificam a coleção de origem.
+
+**Exemplo:**
+```java
+List<String> nomes = Arrays.asList("Ana", "Bia", "Carlos", "Beto");
+
+List<String> nomesComBEmMaiusculo = nomes.stream() // 1. Fonte
+    .filter(nome -> nome.startsWith("B"))        // 2. Operação Intermediária
+    .map(String::toUpperCase)                     // 2. Operação Intermediária
+    .collect(Collectors.toList());                // 3. Operação Terminal
+
+// Resultado: ["BIA", "BETO"]
+```
+
+### Default Methods em Interfaces
+
+**Default Methods** são métodos que podem ter uma implementação diretamente na interface.
+
+**Problema que resolvem:** Permitem adicionar novos métodos a interfaces existentes sem quebrar as classes que já as implementam. Antes do Java 8, adicionar um método a uma interface obrigaria todas as classes implementadoras a fornecer uma implementação, o que era inviável em APIs grandes (como a `java.util.Collection`).
+
+**Exemplo:** O método `forEach` foi adicionado à interface `Iterable` como um default method.
+```java
+interface Veiculo {
+    void acelerar();
+    
+    // Default method
+    default void buzinar() {
+        System.out.println("Beep!");
+    }
+}
+
+class Carro implements Veiculo {
+    @Override
+    public void acelerar() {
+        System.out.println("Acelerando o carro...");
+    }
+}
+
+// A classe Carro não precisou implementar buzinar(), mas pode usá-lo.
+Carro meuCarro = new Carro();
+meuCarro.buzinar(); // Imprime "Beep!"
+```
+
+### Nova API de Data e Hora (java.time)
+
+O Java 8 introduziu o pacote `java.time` para resolver as deficiências das antigas e problemáticas classes `java.util.Date` e `java.util.Calendar`.
+
+**Problemas da API Antiga:**
+- **Não era thread-safe:** `Date` e `Calendar` são mutáveis, o que é um pesadelo em ambientes concorrentes.
+- **API confusa:** Meses com base em zero, difícil de usar para operações de cálculo.
+- **Sem suporte a fusos horários claros:** A manipulação de timezones era complexa.
+
+**Vantagens da Nova API (`java.time`):**
+- **Imutabilidade:** Todas as classes do pacote são imutáveis e, portanto, thread-safe.
+- **API Clara e Fluente:** A API é intuitiva e fácil de ler.
+- **Separação de Conceitos:**
+  - `LocalDate`: Apenas data (ano-mês-dia).
+  - `LocalTime`: Apenas hora (hora-minuto-segundo).
+  - `LocalDateTime`: Data e hora, sem fuso horário.
+  - `ZonedDateTime`: Data e hora com fuso horário.
+  - `Duration`: Duração entre duas horas.
+  - `Period`: Período entre duas datas.
+
+
 ---
 
 ## 2. Arquitetura de Software
